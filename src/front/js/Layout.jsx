@@ -1,15 +1,19 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import ScrollToTop from "./component/scrollToTop";
-import { BackendURL } from "./component/backendURL";
-
-import { Home } from "./pages/home";
+import injectContext from "./store/appContext";
+//Custom component
+import ScrollToTop from "./component/ScrollToTop.jsx";
+import { BackendURL } from "./component/BackendURL.jsx";
+import { Navbar } from "./component/Navbar.jsx";
+import { Footer } from "./component/Footer.jsx";
+//Custom pages or views
+import { Home } from "./pages/Home.jsx";
 import { Demo } from "./pages/demo";
 import { Single } from "./pages/single";
-import injectContext from "./store/appContext";
+import { Error404 } from "./pages/Error404.jsx";
+import { ContactList } from "./component/ContactList.jsx";
+import { AddContact } from "./component/AddContact.jsx";
 
-import { Navbar } from "./component/navbar";
-import { Footer } from "./component/footer";
 
 //create your first component
 const Layout = () => {
@@ -25,10 +29,12 @@ const Layout = () => {
                 <ScrollToTop>
                     <Navbar />
                     <Routes>
+                        <Route element={<ContactList/>} path="/Contact-List"/>
+                        <Route element={<AddContact/>} path="/Add-Contact"/>
                         <Route element={<Home />} path="/" />
                         <Route element={<Demo />} path="/demo" />
                         <Route element={<Single />} path="/single/:theid" />
-                        <Route element={<h1>Not found!</h1>} />
+                        <Route element={<Error404/>} path="*"/>
                     </Routes>
                     <Footer />
                 </ScrollToTop>
