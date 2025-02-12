@@ -8,11 +8,18 @@ import { Navbar } from "./component/Navbar.jsx";
 import { Footer } from "./component/Footer.jsx";
 //Custom pages or views
 import { Home } from "./pages/Home.jsx";
-import { Demo } from "./pages/demo";
-import { Single } from "./pages/single";
+import { Demo } from "./pages/Demo.jsx";
+import { Single } from "./pages/Single.jsx";
 import { Error404 } from "./pages/Error404.jsx";
-import { ContactList } from "./component/ContactList.jsx";
-import { AddContact } from "./component/AddContact.jsx";
+import { ContactList } from "./pages/ContactList.jsx";
+import { AddContact } from "./pages/AddContact.jsx";
+import { Characters } from "./pages/Characters.jsx";
+import { Planets } from "./pages/Planets.jsx";
+import { Vehicles } from "./pages/Vehicles.jsx";
+import { Starships } from "./pages/Starships.jsx";
+import { Details } from "./pages/Details.jsx";
+
+
 
 
 //create your first component
@@ -24,16 +31,21 @@ const Layout = () => {
     if(!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL/ >;
 
     return (
-        <div>
+        <div className="d-flex flex-column min-vh-100">
             <BrowserRouter basename={basename}>
                 <ScrollToTop>
                     <Navbar />
                     <Routes>
-                        <Route element={<ContactList/>} path="/Contact-List"/>
-                        <Route element={<AddContact/>} path="/Add-Contact"/>
+                        <Route element={<ContactList/>} path="/contact-list"/>
+                        <Route element={<AddContact/>} path="/add-Contact"/>
                         <Route element={<Home />} path="/" />
                         <Route element={<Demo />} path="/demo" />
                         <Route element={<Single />} path="/single/:theid" />
+                        <Route element={<Characters />} path="/characters/" />
+                        <Route element={<Planets />} path="/planets/" />
+                        <Route element={<Starships />} path="/starships/" />
+                        <Route element={<Vehicles />} path="/vehicles/" />
+                        <Route element={<Details />} path="/details/:category/:id/" />
                         <Route element={<Error404/>} path="*"/>
                     </Routes>
                     <Footer />
