@@ -35,10 +35,16 @@ export const Navbar = () => {
 					<button id="btnGroupDrop1" type="button" className="btn btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
 					<i className="fa fa-heart text-light pointer"></i>
 					</button>
-					<ul className="dropdown-menu dropdown-menu-end" aria-labelledby="btnGroupDrop1">
-					{store.favorites.map((item) => 
-					<li key={item.id}><Link className="dropdown-item" to='/planets'>{item.name}</Link><i className="fa fa-delete text-danger pointer" onClick={() => actions.removeFavorites(item)}></i></li>
-					)}
+					<ul className="dropdown-menu dropdown-menu-end p-2" aria-labelledby="btnGroupDrop1">
+					{store.favorites.length === 0 ? (
+						<li className="disabled px-2"> No favorites </li> ) : (
+							store.favorites.map((item) => (
+							<li key={item.uid} className="dropdown-item d-flex justify-content-between align-items-center"> 
+							<span>{item.name}</span>
+							<i className="fa fa-trash text-danger pointer px-2" onClick={() => { actions.removeFavorite(item) }}></i>
+							</li>
+							)
+						))}
 					</ul>
 				</div>
 			</div>

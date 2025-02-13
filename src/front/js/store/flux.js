@@ -6,7 +6,8 @@ const getState = ({ getStore, getActions, setStore,useState }) => {
 
 	return {
 		store: {
-			selectedItem: null,
+			selectedItem: {},
+			category: "",
 			contacts: [],
 			characters: [],
 			planets: [],
@@ -15,17 +16,15 @@ const getState = ({ getStore, getActions, setStore,useState }) => {
 			favorites: []
 				},
 			
-			
 
 		actions: {
 			// Use getActions to call a function within a fuction
-			setSelectedItem: (category, id) => {
-				if (!category || !id) {
-                    console.error("Missing category or id in setSelectedItem");
-                    return;
-                }
+			setCategory: (cat) => {
+				setStore({category: cat})
+			},
 
-                fetch(`${base}/${category}/${id}`)
+			setSelectedItem: (category, uid) => {
+                fetch(`${base}/${category}/${uid}`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.result) {
@@ -35,6 +34,8 @@ const getState = ({ getStore, getActions, setStore,useState }) => {
                         }
                     })
                     .catch(error => console.error("Error fetching details:", error));
+
+		
             },
 
 			getCharacters: async() => {
@@ -93,14 +94,16 @@ const getState = ({ getStore, getActions, setStore,useState }) => {
 				setStore({planets: data.results})
 				console.log(data);
 			},
-			addFavorites: (item) => {
+			addFavorite: (item) => {
 				const store = getStore();
-				if (!store.favorites.some(fav => fav.id === item.id)) {
-					setStore({ favorites: [...store.favorites, item] });}
+				if (!store.favorites.some(fav => fav.name === item.name)) {
+					setStore({ favorites: [...store.favorites, item] });
+					console.log(getStore().favorites)
+				}
 			},
-			removeFavorites: (id) => {
+			removeFavorite: (item) => {
 				const store = getStore();
-				setStore({ favorites: store.favorites.filter(fav => fav.id !== id) });
+				setStore({ favorites: store.favorites.filter(fav => fav.name !== item.name) });
 			},
 			getContacts: async() =>{
 				const uri = `${host}/agendas/${slug}/contacts`;
