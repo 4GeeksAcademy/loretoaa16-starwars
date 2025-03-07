@@ -4,7 +4,7 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 from flask import Flask, request, jsonify, url_for, Blueprint
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
-from api.models import db, Users
+from api.models import db, Users, PlanetFavorites, CharacterFavorites
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import get_jwt_identity
@@ -83,17 +83,6 @@ def user_id(user_id):
     response_body['message'] = 'algo salió'
     return response_body, 400
 
-@api.route('/users/<int:user_id>/favorite-planets', methods=['POST'])
-def favorite_planets(user_id):
-    response_body = {}
-    if request.method == 'POST':
-        data = request.json()  
-        row = 
-        response_body['message'] = 'Planet addedd to favorite'
-        return response_body, 200
-    response_body['message'] = 'algo salió'
-    return response_body, 400
-
 @api.route('/characters', methods=['GET'])
 def characters():
     response_body = {}
@@ -120,6 +109,33 @@ def character_id(character_id):
         response_body['results'] = data['result']['properties']
         return response_body, 200
     response_body['message'] = 'algo salió'
+    return response_body, 400
+
+@api.route('/users/<int:user_id>/favorite-character', methods=['POST', 'DELETE'])
+def favorite_character(user_id):
+    print(user_id)
+    response_body = {}
+    if request.method == 'POST':
+        data = request.json
+        print(data)
+        row = CharacterFavorites(user_id=user_id, character_id=data['character_id'])
+        db.session.add(row)
+        db.session.commit()
+        response_body['message'] = 'Character addedd to favorite'
+        response_body['results'] = row.serialize()
+        return response_body, 200
+    if request.method == 'DELETE':
+        data = request.json
+        print(data)
+        row = CharacterFavorites.query.filter_by(user_id=user_id, character_id=data['character_id']).first()
+        if not row:
+            return {"message": "Favorite character not found"}, 404  # Return 404 if not found
+        db.session.delete(row)
+        db.session.commit()
+        response_body['message'] = 'Character deleted from favorite'
+        response_body['results'] = row.serialize()
+        return response_body, 200
+    response_body['message'] = 'unexpected error'
     return response_body, 400
 
 @api.route('/planets', methods=['GET'])
@@ -149,3 +165,51 @@ def planet_id(planet_id):
         return response_body, 200
     response_body['message'] = 'algo salió'
     return response_body, 400
+
+@api.route('/users/<int:user_id>/favorite-planet', methods=['POST', 'DELETE'])
+def favorite_planet(user_id):
+    print(user_id)
+    response_body = {}
+    if request.method == 'POST':
+        data = request.json
+        print(data)
+        row = PlanetFavorites(user_id=user_id, planet_id=data['planet_id'])
+        db.session.add(row)
+        db.session.commit()
+        response_body['message'] = 'Planet addedd to favorite'
+        response_body['results'] = row.serialize()
+        return response_body, 200
+    if request.method == 'DELETE':
+        data = request.json
+        print(data)
+        row = PlanetFavorites.query.filter_by(user_id=user_id, planet_id=data['planet_id']).first()
+        if not row:
+            return {"message": "Favorite planet not found"}, 404  # Return 404 if not found
+        db.session.delete(row)
+        db.session.commit()
+        response_body['message'] = 'Planet deleted from favorite'
+        response_body['results'] = row.serialize()
+        return response_body, 200
+    response_body['message'] = 'unexpected error'
+    return response_body, 400
+
+@api.route('/users/<int:user_id>/favorites', methods=['GET'])
+def get_favorites(user_id):
+    response_body = {}
+
+    # Query favorite characters
+    character_favorites = CharacterFavorites.query.filter_by(user_id=user_id).all()
+    characters = [fav.serialize() for fav in character_favorites]
+
+    # Query favorite planets
+    planet_favorites = PlanetFavorites.query.filter_by(user_id=user_id).all()
+    planets = [fav.serialize() for fav in planet_favorites]
+
+    # Prepare response
+    response_body['message'] = 'Favorites retrieved successfully'
+    response_body['favorites'] = {
+        'characters': characters,
+        'planets': planets
+    }
+
+    return jsonify(response_body), 200
