@@ -6,6 +6,7 @@ import ScrollToTop from "./component/ScrollToTop.jsx";
 import { BackendURL } from "./component/BackendURL.jsx";
 import { Navbar } from "./component/Navbar.jsx";
 import { Footer } from "./component/Footer.jsx";
+import { Alert } from "./component/Alert.jsx";
 //Custom pages or views
 import { Home } from "./pages/Home.jsx";
 import { Demo } from "./pages/Demo.jsx";
@@ -18,8 +19,10 @@ import { Planets } from "./pages/Planets.jsx";
 import { Vehicles } from "./pages/Vehicles.jsx";
 import { Starships } from "./pages/Starships.jsx";
 import { Details } from "./pages/Details.jsx";
-
-
+import { Login } from "./pages/Login.jsx";
+import { Register } from "./pages/Register.jsx";
+import { Posts } from "./pages/Posts.jsx";
+import { Profile } from "./pages/Profile.jsx";
 
 
 //create your first component
@@ -35,6 +38,7 @@ const Layout = () => {
             <BrowserRouter basename={basename}>
                 <ScrollToTop>
                     <Navbar />
+                    <Alert />
                     <Routes>
                         <Route element={<ContactList/>} path="/contact-list"/>
                         <Route element={<AddContact/>} path="/add-Contact"/>
@@ -46,6 +50,10 @@ const Layout = () => {
                         <Route element={<Starships />} path="/starships/" />
                         <Route element={<Vehicles />} path="/vehicles/" />
                         <Route element={<Details />} path="/details/" />
+                        <Route element={<Login />} path="/login/" />
+                        <Route element={<Register />} path="/register/" />
+                        <Route element={<Posts />} path="/posts/" />
+                        <Route element={<Profile />} path="/profile/" />
                         <Route element={<Error404/>} path="*"/>
                     </Routes>
                     <Footer />

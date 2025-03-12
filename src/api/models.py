@@ -9,9 +9,9 @@ class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    is_active = db.Column(db.Boolean(), unique=False, nullable=False, default=True)
     is_admin = db.Column(db.Boolean(), nullable=False)
-    first_name = db.Column(db.String, nullable=True)
+    first_name = db.Column(db.String, nullable=False)
     last_name = db.Column(db.String)
 
     def __repr__(self):
@@ -23,7 +23,8 @@ class Users(db.Model):
                 'email': self.email,
                 'is_active': self.is_active,
                 'first_name': self.first_name,
-                'last_name': self.last_name}
+                'last_name': self.last_name,
+                'is_admin': self.is_admin}
 
 class Posts(db.Model):
     id = db.Column(db.Integer, primary_key=True)

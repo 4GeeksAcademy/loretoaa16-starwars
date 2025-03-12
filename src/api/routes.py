@@ -24,37 +24,84 @@ def handle_hello():
 
 @api.route('/users', methods=['GET'])
 def users():
+    response_body = { }
+    rows = db.session.execute(db.select(Users)).scalars()  #Scalars devuelve una lista
+    # Opcion 1 : Standard
+    """ results = []
+    for row in rows:
+        results.append(row.serialize()) """
+    # Opcion 2 : Comprension de listas - Se usa más que la opción 1
+    # Variable = [ target for indivivdual en iterables ]
+    results = [ row.serialize() for row in rows ]
+    response_body["message"] = f'Listado de Usuarios'
+    response_body["results"] = results
+    return(response_body), 200
+
+@api.route('/users', methods=['POST'])
+def register_user():
     response_body = {}
-    url = 'https://jsonplaceholder.typicode.com/users'
-    response = requests.get(url)
-    print(response)
-    if response.status_code == 200:
-        data = response.json()
-        response_body['message'] = 'Listado de usuarios'
-        response_body['results'] = data
-        return response_body, 200
-    response_body['message'] = 'algo salió'
-    return response_body, 400
+    data = request.json
+    print("soy el data de register", data)
+    
+    row = Users(first_name=data.get('first_name', ""), last_name=data.get('last_name', ""), email=data['email'], password=data['password'], is_admin=data.get('is_admin', False))
+    db.session.add(row)
+    db.session.commit()
+    
+    user = row.serialize()
+    claims = {'user_id': user['id'],
+              'is_admin': user['is_admin']}
+    print(claims)
+
+    access_token = create_access_token(identity=user["email"], additional_claims=claims)
+    response_body['message'] = 'User registered!'
+    response_body['access_token'] = access_token
+    response_body['results'] = user
+    return response_body, 200
+
+    
+
+@api.route('/users/<int:id>', methods=['PUT'])
+def edit_user(id):
+    response_body = {}
+    data = request.json
+    print("soy el data de edit user", data)
+    row = Users.query.get(id)
+    if not row:
+        response_body['message'] = 'User not found'
+        return response_body, 404
+    row.first_name = data.get('first_name', row.first_name)  # Use .get() to avoid KeyError
+    row.last_name = data.get('last_name', row.last_name)
+    row.email = data.get('email', row.email)
+    row.password = data.get('password', row.password)  # Ideally, hash the password before saving
+    row.is_admin = data.get('is_admin', row.is_admin)
+    
+    db.session.commit()
+    response_body['message'] = 'User edited'
+    response_body['results'] = row.serialize()
+    return response_body, 200
+
 
 @api.route("/login", methods=["POST"])
 def login():
     response_body = {}
     data = request.json
-    email = request.json.get("email", None)
-    password = request.json.get("password", None)
+    print("soy data de login", data)
+    email = data.get("email", None)
+    password = data.get("password", None)
     row = db.session.execute(db.select(Users).where(Users.email==email, Users.password==password, Users.is_active)).scalar()
     # if the request is successful, row should return something (therefore is true), ifnot it will return none
     if not row:
         response_body['message'] = "Bad email or password"
         return response_body, 401
-    Users = row.serialize()
-    claims = {'user_id': row['id'],
-              'is_admin': row['is_admin']}
+    user = row.serialize()
+    claims = {'user_id': user['id'],
+              'is_admin': user['is_admin']}
     print(claims)
 
     access_token = create_access_token(identity=email, additional_claims=claims)
     response_body['message'] = 'User logged!'
     response_body['access_token'] = access_token
+    response_body['results'] = user
     return response_body, 200
 
 # Protect a route with jwt_required, which will kick out requests
