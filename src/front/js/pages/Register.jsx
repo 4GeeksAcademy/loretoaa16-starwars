@@ -24,7 +24,7 @@ export const Register = () => {
         const dataToSend = {
             first_name: firstName, 
             last_name: lastName, 
-            email: email, 
+            email: email,
             password: password
         }
         console.log(dataToSend)
@@ -32,7 +32,7 @@ export const Register = () => {
         actions.register(dataToSend);
        
         navigate('/')
-        // cambien el valor del btn login a logout del navbar
+        // cambien el valor del btn login a logout del navbar 
     }
 
     return (

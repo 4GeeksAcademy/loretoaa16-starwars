@@ -4,7 +4,7 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 from flask import Flask, request, jsonify, url_for, Blueprint
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
-from api.models import db, Users, PlanetFavorites, CharacterFavorites
+from api.models import db, Users, PlanetFavorites, CharacterFavorites, Followers
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import get_jwt_identity
@@ -58,14 +58,25 @@ def register_user():
     response_body['results'] = user
     return response_body, 200
 
-    
+@api.route('/users2', methods=['PUT'])
+@jwt_required()
+def prueba():
+    response_body = {}
+    claims = get_jwt()['user_id']
+    response_body['usuario']=claims
+    """ data = claims.user_id """
+    return response_body, 200
 
-@api.route('/users/<int:id>', methods=['PUT'])
-def edit_user(id):
+@api.route('/users', methods=['PUT'])
+@jwt_required()
+def edit_user():
     response_body = {}
     data = request.json
+    user_id = get_jwt()['user_id']
     print("soy el data de edit user", data)
-    row = Users.query.get(id)
+    print("soy el userid de edit", user_id)
+    row = Users.query.get(user_id)
+    print("soy el print de row serialize", row.serialize())
     if not row:
         response_body['message'] = 'User not found'
         return response_body, 404
@@ -74,12 +85,10 @@ def edit_user(id):
     row.email = data.get('email', row.email)
     row.password = data.get('password', row.password)  # Ideally, hash the password before saving
     row.is_admin = data.get('is_admin', row.is_admin)
-    
     db.session.commit()
     response_body['message'] = 'User edited'
     response_body['results'] = row.serialize()
     return response_body, 200
-
 
 @api.route("/login", methods=["POST"])
 def login():
@@ -260,3 +269,29 @@ def get_favorites(user_id):
     }
 
     return jsonify(response_body), 200
+
+@api.route('/followers', methods=['POST'])
+@jwt_required()
+def followers():
+    response_body = {}
+    additional_claims = get_jwt() #datos adicionales
+    follower = additional_claims['user_id']
+    following = request.json.get('following_id')
+
+    #valido si ya existe la relacion de seguido y seguidor
+    foo = db.session.execute(db.select(Followers).where(Followers.follower_id==follower, Followers.following_id==following)).scalar()
+    if foo:
+        response_body, 400
+    #un usuario no se puede seguir a si mismo
+    if follower == following:
+        response_body['message'] = 'Error: you cannot follow yourself'
+        return response_body, 400
+
+    #agrego la db lo que me están enviando
+    row = Followers(follower_id=follower,
+                    following_id=following)
+    db.session.add(row)
+    db.session.commit()
+    response_body['message'] = f'followers added'
+    response_body['results'] = row.serialize()
+    return response_body, 200

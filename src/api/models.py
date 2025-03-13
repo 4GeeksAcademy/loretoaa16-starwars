@@ -59,6 +59,11 @@ class Followers(db.Model):
     follower_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     follower_to = db.relationship('Users', foreign_keys=[follower_id], backref=db.backref('follower_to'), lazy='select')
 
+    def serialize(self):
+        return {'id': self.id,
+                'following_id': self.following_id,
+                'follower_id': self.follower_id}
+
 class Characters(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=True)

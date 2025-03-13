@@ -159,16 +159,16 @@ const getState = ({ getStore, getActions, setStore,useState }) => {
 				const data = await response.json();
 				console.log("Profile ok:", data);
 			},
-			updateProfile: async (userId) => {
+			updateProfile: async (updatedUser) => {
 				const token = localStorage.getItem('token');
-				const uri = `${process.env.BACKEND_URL}/api/users/${userId}`;
+				const uri = `${process.env.BACKEND_URL}/api/users`;
 				const options = {
 					method: 'PUT',
 					headers: { 
 						Authorization: `Bearer ${token}`,
-						"Content-Type": "application/json"
+						"Content-Type": "Application/json"
 					},
-					body: JSON.stringify() 
+					body: JSON.stringify(updatedUser) 
 				};
 			
 				const response = await fetch(uri, options);
@@ -335,6 +335,7 @@ const getState = ({ getStore, getActions, setStore,useState }) => {
 				setStore()
 				getActions().getContacts(); 
 			}
+
 			
 		}
 	};

@@ -20,17 +20,29 @@ export const Profile = () => {
     const handleSubmitEdit = (event) => {
         event.preventDefault();
         const updatedUser = {
-            ...user, // Mantiene otros datos del usuario
+           // ...user, Mantiene otros datos del usuario
             first_name: firstName,
             last_name: lastName,
-            email: email, // *OJO*: no deberías almacenar la contraseña en localStorage por seguridad
+            email: email /* !== user.email ? email : user.email */
         };
-        actions.updateProfile(user.id, updatedUser);
+        /* const updatedFields = {}; // Store only changed values
+        if (firstName !== user.first_name) updatedFields.first_name = firstName;
+        if (lastName !== user.last_name) updatedFields.last_name = lastName;
+        if (email !== user.email) updatedFields.email = email;
+        
+    
+        // If there are no changes, prevent unnecessary API calls
+        if (Object.keys(updatedFields).length === 0) {
+            console.log("No changes detected, skipping update.");
+            return;
+        } */
+        actions.updateProfile(updatedUser);
         // Guardar el usuario actualizado en localStorage
         localStorage.setItem("user", JSON.stringify(updatedUser));
         console.log("Profile updated successfully", updatedUser);
         navigate("/profile");
     };
+
     return (
         <div className="container mt-5">
             <h2 className="mb-4">Profile</h2>
